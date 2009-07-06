@@ -1,0 +1,17 @@
+.Block { padding:0 0 0 0px; font:11px Verdana, Geneva, Arial, Helvetica, sans-serif;  }
+.Block .Spacer { cursor:default; padding:2px 2px 2px 15px; }
+.Block .Link { display:block; color:#333; padding:2px 2px 2px 0; }
+.Block .Link .Content { padding:2px 2px 2px 2px; }
+.Block .Link .TagName { cursor:pointer; }
+.Block .Parent { color:#111; text-decoration:none; }
+.Block .Parent .Spacer { background:#fff center no-repeat; }
+.Block .Parent .Spacer { background-image:url(/static/img/tree_open.gif); }
+.Block .Open .Spacer { background-image:url(/static/img/tree_close.gif) }
+.Block .Selected { background-color:#4473c4; }
+.Block .Selected * { color:#fff; }
+.Block .SubContainer { padding-left:20px; height:0; font-size:0px; }
+.Block .OpenSubContainer { height:auto; }
+.Unvisible { opacity:0.5; filter:Alpha(Opacity=50); }
+.DarkBlue {color:#3C3CA4;}
+.Blue {color:#3E3EFF;}
+.Red {color:#FF1414;}
