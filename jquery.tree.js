@@ -7,12 +7,10 @@ function curry(fn) {
     };
 }
 
-function displayAttribute(attribute) {
-    var value = attribute.nodeValue;
-    if (value.length > $.tree.settings.maximumAttributeValueLength) {
-        value = value.substring(0, $.tree.settings.maximumAttributeValueLength) + '...';
-    }
-    return attribute.nodeName+"=\"<span class='Red'>"+value+"</span>\"";
+function truncate(s, _maxLength, _suffix) {
+    var maxLength = _maxLength || $.tree.settings.truncateLength,
+        suffix = _suffix || $.tree.settings.truncateSuffix;
+    return s.length > maxLength ? s.substring(0, maxLength) + suffix : s;
 }
 
 function displayTree(_element, _parent) {
@@ -38,7 +36,8 @@ function displayTree(_element, _parent) {
         $parent.append("<a class='Block'><span class='DarkBlue'>&#60;<span class='Blue'>" + element.tagName.toLowerCase() + "</span>&#62;</a>"); 
     }
 
-    var $elementChildren = $element.children();
+    // Allow filtering of children.
+    var $elementChildren = $.tree.settings.getChildren ? $.tree.settings.getChildren($element) : $element.children();
     if ($elementChildren.length) {
         $elementChildren.each(function() {
             var $self = $(this),
@@ -51,19 +50,18 @@ function displayTree(_element, _parent) {
             for (var i = 0, len = this.attributes.length; i < len; i++) {            
                 var attribute = this.attributes[i];
                 if (attribute.nodeName && attribute.nodeValue) {
-                    result.push(displayAttribute(attribute));
+                    result.push(" " + attribute.nodeName+"=\"<span class='Red'>"+truncate(attribute.nodeValue)+"</span>\"");
                 }
             }
-            
-            $html = $("<span class='Content'><span class='DarkBlue'>&#60;<span class='Blue'>" + this.tagName.toLowerCase() + '</span> ' + result.join(" ") + "&#62;</span>").appendTo($link);
+
+            $html = $("<span class='Content'><span class='DarkBlue'>&#60;<span class='Blue'>" + this.tagName.toLowerCase() + '</span>' + result.join(" ") + "&#62;</span>").appendTo($link);            
             $subContainer = $("<div class='SubContainer'></div>").appendTo($container);
                         
             if ($children.length) {
                 $link.addClass("Parent");
-                // @@@ Add ability to call custom functions.
-                $link.click(curry(displayTree, $self, $subContainer));
+                $link.click(curry($.tree.settings.onClick, $self, $subContainer));
             } else {
-                $html.append($self.html() + "<span class='DarkBlue'>&#60;/<span class='Blue'>" + this.tagName.toLowerCase() + "</span>&#62;</span>");
+                $html.append(truncate($self.html()) + "<span class='DarkBlue'>&#60;/<span class='Blue'>" + this.tagName.toLowerCase() + "</span>&#62;</span>");
             }
         });
         
@@ -77,17 +75,18 @@ $.tree = function(_context, _container) {
     $.tree.context = $(_context);
     $.tree.container = $(_container);
     displayTree($.tree.context, $.tree.container);
-
 }
 
 $.tree.settings = {
-    maximumAttributeValueLength: 50,
-    onClick: null, 
-    // onClick:         // what to do when an element is clicked (opened!)
-    // context: ;       // what DOM structure to draw
-    // container: ;     // where to draw it
+    // Where to round the text.
+    truncateLength: 50,
+    truncateSuffix: "...",
+    // Passed $element can filter / add whatever to children.
+    // getChildren: 
+    // Function to call when an element is clicked.
+    onClick: displayTree,
+    // Removes elements matching the expression from the set of tree children.
+    // exclude: "",
 }
-
-
 
 })(jQuery);
